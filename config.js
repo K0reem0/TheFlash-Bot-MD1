@@ -13,7 +13,7 @@ import { en, es, id, ar, pt } from "./lib/idiomas/total-idiomas.js"
 // [ES] > Agrega el número que será Bot y los que serán propietarios.
 // [EN] > Add the number that will be Bot and those that will be owners.
 global.owner = [
-["201280244814", '👑 Flash - Z4cK & Mori 👑', true],//عدل الرقم والاسم وحط اسمك ورقمك
+['966560801636', '👑 AURTHER 👑', true],//عدل الرقم والاسم وحط اسمك ورقمك
 ]
 
 
@@ -116,9 +116,9 @@ global.moment = moment
 // [ES] > Agregate a ti, colaboradores o ayudates, aparecerá en el comando de lista de contactos.
 // [EN] > Adding yourself, collaborators or helpers will appear in the contact list command.
 global.official = [ // Agregate si eres Owner
-["972546887176", '👑 Flash - Zack 👑', 1], 
-["20124563219", '💫 Flash - Naruto 💫', 1],  
-["972546887176", '👑 Flash - Zack 👑', 1]]
+["966560801636", '👑 Flash - Zack 👑', 1], 
+["966560801636", '💫 Flash - Naruto 💫', 1],  
+["966560801636", '👑 Flash - Zack 👑', 1]]
 
 global.mail = '' // Add email
 global.desc = '' // Add short description (20 caractres max)
