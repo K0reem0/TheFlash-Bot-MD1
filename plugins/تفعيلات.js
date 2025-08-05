@@ -229,6 +229,14 @@ const handler = async (m, {conn, usedPrefix, command, args, isOwner, isAdmin, is
       }
       global.opts['self'] = !isEnable;
       break;
+    case 'خاص':
+      isAll = true;
+      if (!isROwner) {
+        global.dfail('rowner', m, conn);
+        throw false;
+      }
+      global.opts['self'] = isEnable;
+      break;
     case 'مضادالينكات':
       if (m.isGroup) {
         if (!(isAdmin || isOwner)) {
