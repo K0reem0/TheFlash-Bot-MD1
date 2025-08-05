@@ -1471,16 +1471,16 @@ let fkontak2 = { "key": { "participants":"0@s.whatsapp.net", "remoteJid": "statu
 this.sendMessage(id, { text: text, 
 contextInfo:{
 forwardingScore: 9999999,
-isForwarded: true, 
+isForwarded: false, 
 mentionedJid:[user],
 "externalAdReply": {
-"showAdAttribution": true,
-"renderLargerThumbnail": true,
+"showAdAttribution": false,
+"renderLargerThumbnail": false,
 "thumbnail": apii.data, 
-"title": [wm, '😻 𝗦𝘂𝗽𝗲𝗿 ' + gt + ' 😻', '🌟 centergatabot.gmail.com'].getRandom(),
+"title": [wm, '😻 𝗦𝘂𝗽𝗲𝗿 ' + gt + ' 😻', '🌟 '].getRandom(),
 "containsAutoReply": true,
 "mediaType": 1, 
-sourceUrl: 'https://github.com/GataNina-Li/GataBot-MD' }}}, { quoted: fkontak2 })
+sourceUrl: '' }}}, { quoted: fkontak2 })
 apii.data = ''
 //this.sendFile(id, apii.data, 'pp.jpg', text, null, false, { mentions: [user] }, { quoted: fkontak2 })
 }}}
