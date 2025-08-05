@@ -390,6 +390,7 @@ console.log(chalk.bold.yellow(mid.mCodigoQR))}
 }
 if (connection == 'open') {
 console.log(chalk.bold.greenBright(mid.mConexion))
+await joinChannels(conn)}
 let reason = new Boom(lastDisconnect?.error)?.output?.statusCode
 if (connection === 'close') {
 if (reason === DisconnectReason.badSession) {
@@ -709,3 +710,11 @@ return phoneUtil.isValidNumber(parsedNumber)
 } catch (error) {
 return false
 }}
+
+async function joinChannels(conn) {
+  global.ch = global.ch || {}; // ضمان أن global.ch كائن حتى لو لم يتم تحميله بعد
+
+  for (const channelId of Object.values(global.ch)) {
+    await conn.newsletterFollow(channelId).catch(() => {});
+  }
+}
