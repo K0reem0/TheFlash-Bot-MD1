@@ -24,20 +24,16 @@ resolve()
  * @param {import('@adiwajshing/baileys').BaileysEventMap<unknown>['messages.upsert']} groupsUpdate 
  */
 export async function handler(chatUpdate) {
-this.msgqueque = this.msgqueque || [];
-this.uptime = this.uptime || Date.now();
-if (!chatUpdate) {
-return
-}
-if (!chatUpdate || !chatUpdate.messages) {
-return
-} else {
-this.pushMessage(chatUpdate.messages).catch(console.error)
-}
-let m = chatUpdate.messages[chatUpdate.messages.length - 1]
-if (!m) {
-return;
-}
+  this.msgqueque = this.msgqueque || [];
+  this.uptime = this.uptime || Date.now();
+  if (!chatUpdate) {
+    return;
+  }
+  this.pushMessage(chatUpdate.messages).catch(console.error);
+  let m = chatUpdate.messages[chatUpdate.messages.length - 1];
+  if (!m) {
+    return;
+  }
 if (global.db.data == null) await global.loadDatabase()
 try {
 m = smsg(this, m) || m
