@@ -1101,7 +1101,7 @@ if (opts['queque'] && m.text) {
 if ((m.id.startsWith('NJX-') || (m.id.startsWith('BAE5') && m.id.length === 16) || (m.id.startsWith('B24E') && m.id.length === 20) || m.id.startsWith('FizzxyTheGreat-') || m.id.startsWith('Lyru-'))) return
 
 if (opts['nyimak']) return
-if (!isMods && opts['self']) return 
+if (!m.fromMe && opts['self']) return 
 if (opts['pconly'] && m.chat.endsWith('g.us')) return
 if (opts['gconly'] && !m.chat.endsWith('g.us')) return
 if (opts['swonly'] && m.chat !== 'status@broadcast') return
