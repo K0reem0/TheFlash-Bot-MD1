@@ -104,6 +104,15 @@ if (useMongo) {
     global.db.chain = chain(global.db.data)
   }
 
+  // ⚡️ هنا نضيف save
+  global.db.save = async function saveDatabase() {
+    try {
+      await global.db.write()
+    } catch (e) {
+      console.error('Error saving MongoDB database:', e)
+    }
+  }
+
 } else {
   // ====== Filesystem Mode ======
   global.db = {
