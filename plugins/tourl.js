@@ -1,5 +1,5 @@
-import uploadFile from '../src/libraries/uploadFile.js';
-import uploadImage from '../src/libraries/uploadImage.js';
+import uploadFile from '../lib/uploadFile.js';
+import uploadImage from '../lib/uploadImage.js';
 import fs from 'fs'
 
 const handler = async (m) => {
