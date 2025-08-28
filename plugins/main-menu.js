@@ -4,7 +4,7 @@ import axios from 'axios';
 import path from 'path';
 
 let handler = async (m, { conn }) => {
-    const imageUrl = 'https://i.pinimg.com/736x/48/27/e0/4827e076520e93a15c0ad34924c54ebd.jpg';
+    const imageUrl = 'https://uploadf.com/file/jaj200i3q9a7pnby07t21rldav2n4h0m0o13jpp0z3ocpbkwfiq8q3s4af7j7imgol.jpg';
 
     // تحميل الصورة من الرابط وحفظها مؤقتًا
     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
