@@ -48,170 +48,41 @@ const __dirname = global.__dirname(import.meta.url);
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
 global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®&.\\-.@').replace(/[|\\{}()[\]^$+*.\-\^]/g, '\\$&') + ']')
 
-// مسار قاعدة الملفات (في حالة ما فيه MongoDB)
-const databasePath = path.join(__dirname, 'database')
-if (!fs.existsSync(databasePath)) fs.mkdirSync(databasePath)
+global.opts['db'] = process.env.DATABASE_URL;
 
-const usersPath = path.join(databasePath, 'users')
-const chatsPath = path.join(databasePath, 'chats')
-const settingsPath = path.join(databasePath, 'settings')
-const msgsPath = path.join(databasePath, 'msgs')
-const stickerPath = path.join(databasePath, 'sticker')
-const statsPath = path.join(databasePath, 'stats')
+global.db = new Low(
+  /https?:\/\//.test(opts['db'] || '')
+    ? new CloudDBAdapter(opts['db'])
+    : /mongodb(\+srv)?:\/\//i.test(opts['db'])
+      ? new MongoDB(opts['db'])
+      : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`)
+);
 
-;[usersPath, chatsPath, settingsPath, msgsPath, stickerPath, statsPath].forEach((dir) => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir)
-})
-
-function getFilePath(basePath, id) {
-  return path.join(basePath, `${id}.json`)
+global.DATABASE = global.db;
+global.loadDatabase = async function loadDatabase() {
+if (global.db.READ) {
+return new Promise((resolve) => setInterval(async function() {
+if (!global.db.READ) {
+clearInterval(this);
+resolve(global.db.data == null ? global.loadDatabase() : global.db.data);
+}}, 1 * 1000));
 }
-
-// هنا نحدد إذا MongoDB أو ملفات
-global.opts = {}
-global.opts['db'] = process.env.DATABASE_URL
-
-let useMongo = /mongodb(\+srv)?:\/\//i.test(global.opts['db'] || '')
-
-if (useMongo) {
-  // ====== MongoDB Mode ======
-  global.db = new Low(new MongoDB(global.opts['db']))
-  global.DATABASE = global.db
-
-  global.loadDatabase = async function loadDatabase() {
-    if (global.db.READ)
-      return new Promise(resolve => {
-        const interval = setInterval(async function () {
-          if (!global.db.READ) {
-            clearInterval(interval)
-            resolve(global.db.data == null ? global.loadDatabase() : global.db.data)
-          }
-        }, 1000)
-      })
-
-    if (global.db.data !== null) return
-
-    global.db.READ = true
-    await global.db.read().catch(console.error)
-    global.db.READ = null
-
-    global.db.data = Object.assign({
-      users: {},
-      chats: {},
-      stats: {},
-      msgs: {},
-      sticker: {},
-      settings: {}
-    }, global.db.data || {})
-
-    global.db.chain = chain(global.db.data)
-  }
-
-  // ⚡️ هنا نضيف save
-  global.db.save = async function saveDatabase() {
-    try {
-      await global.db.write()
-    } catch (e) {
-      console.error('Error saving MongoDB database:', e)
-    }
-  }
-
-} else {
-  // ====== Filesystem Mode ======
-  global.db = {
-    data: {
-      users: {},
-      chats: {},
-      settings: {},
-      msgs: {},
-      sticker: {},
-      stats: {},
-    },
-    READ: false,
-  }
-
-  global.loadDatabase = async function loadDatabase() {
-    if (global.db.READ) {
-      return new Promise((resolve) => {
-        const interval = setInterval(() => {
-          if (!global.db.READ) {
-            clearInterval(interval)
-            resolve(global.db.data)
-          }
-        }, 1000)
-      })
-    }
-
-    global.db.READ = true
-    try {
-      const loadFiles = async (dirPath, targetObj, ignorePatterns = []) => {
-        const files = fs.readdirSync(dirPath)
-        for (const file of files) {
-          const id = path.basename(file, '.json')
-          if (ignorePatterns.some(pattern => id.includes(pattern))) continue
-          const db = new Low(new JSONFile(getFilePath(dirPath, id)))
-          await db.read()
-          db.data = db.data || {}
-          targetObj[id] = { ...targetObj[id], ...db.data }
-        }
-      }
-
-      await Promise.all([
-        loadFiles(usersPath, global.db.data.users, ['@newsletter', 'lid']),
-        loadFiles(chatsPath, global.db.data.chats, ['@newsletter']),
-        loadFiles(settingsPath, global.db.data.settings),
-        loadFiles(msgsPath, global.db.data.msgs),
-        loadFiles(stickerPath, global.db.data.sticker),
-        loadFiles(statsPath, global.db.data.stats),
-      ])
-    } catch (error) {
-      console.error('Error loading database:', error)
-    } finally {
-      global.db.READ = false
-    }
-  }
-
-  global.db.save = async function saveDatabase() {
-    if (global.db.READ) {
-      await new Promise((resolve) => {
-        const interval = setInterval(() => {
-          if (!global.db.READ) {
-            clearInterval(interval)
-            resolve()
-          }
-        }, 100)
-      })
-    }
-
-    global.db.READ = true
-    try {
-      const saveFiles = async (dirPath, dataObj, ignorePatterns = []) => {
-        for (const [id, data] of Object.entries(dataObj)) {
-          if (ignorePatterns.some(pattern => id.includes(pattern))) continue
-          const db = new Low(new JSONFile(getFilePath(dirPath, id)))
-          db.data = data
-          await db.write()
-        }
-      }
-
-      await Promise.all([
-        saveFiles(usersPath, global.db.data.users, ['@newsletter', 'lid']),
-        saveFiles(chatsPath, global.db.data.chats, ['@newsletter']),
-        saveFiles(settingsPath, global.db.data.settings),
-        saveFiles(msgsPath, global.db.data.msgs),
-        saveFiles(stickerPath, global.db.data.sticker),
-        saveFiles(statsPath, global.db.data.stats),
-      ])
-    } catch (error) {
-      console.error('Error saving database:', error)
-    } finally {
-      global.db.READ = false
-    }
-  }
-}
-
-await global.loadDatabase()
-
+if (global.db.data !== null) return;
+global.db.READ = true;
+await global.db.read().catch(console.error);
+global.db.READ = null;
+global.db.data = {
+users: {},
+chats: {},
+stats: {},
+msgs: {},
+sticker: {},
+settings: {},
+...(global.db.data || {}),
+};
+global.db.chain = chain(global.db.data);
+};
+loadDatabase();
 
 /*global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile('database.json'))
 global.DATABASE = global.db; 
