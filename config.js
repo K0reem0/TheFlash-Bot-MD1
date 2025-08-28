@@ -14,8 +14,9 @@ import { en, es, id, ar, pt } from "./lib/idiomas/total-idiomas.js"
 // [EN] > Add the number that will be Bot and those that will be owners.
 global.owner = [
 ['966560801636', '👑 AURTHER 👑', true],//عدل الرقم والاسم وحط اسمك ورقمك
-[156371605569680],
-[236979702779973],
+['967779416950'],
+['156371605569680'],
+['236979702779973'],
 ]
 
 
