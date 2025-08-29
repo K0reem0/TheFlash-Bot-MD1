@@ -712,6 +712,9 @@ return false
 }}
 
 async function joinChannels(conn) {
-for (const channelId of Object.values(global.ch)) {
-await conn.newsletterFollow(channelId).catch(() => {})
-}}
+  global.ch = global.ch || {}; // ضمان أن global.ch كائن حتى لو لم يتم تحميله بعد
+
+  for (const channelId of Object.values(global.ch)) {
+    await conn.newsletterFollow(channelId).catch(() => {});
+  }
+}
