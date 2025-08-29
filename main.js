@@ -17,7 +17,6 @@ import pino from 'pino'
 import Pino from 'pino'
 import { Boom } from '@hapi/boom'
 import { makeWASocket, protoType, serialize } from './lib/simple.js'
-import { MongoDB } from './lib/mongoDB.js'
 import {Low, JSONFile} from 'lowdb'
 import store from './lib/store.js'
 import readline from 'readline'
@@ -30,9 +29,6 @@ const { makeInMemoryStore, DisconnectReason, useMultiFileAuthState, MessageRetry
 const { CONNECTING } = ws
 const { chain } = lodash
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-const GITHUB_USERNAME = process.env.GITHUB_USERNAME
-const GITHUB_REPO = process.env.GITHUB_REPO
 protoType()
 serialize()
 global.__filename = function filename(pathURL = import.meta.url, rmPrefix = platform !== 'win32') {
@@ -48,6 +44,7 @@ const __dirname = global.__dirname(import.meta.url);
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
 global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®&.\\-.@').replace(/[|\\{}()[\]^$+*.\-\^]/g, '\\$&') + ']')
 
+//news
 const databasePath = path.join(__dirname, 'database');
 if (!fs.existsSync(databasePath)) fs.mkdirSync(databasePath);
 
@@ -63,7 +60,7 @@ if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 });
 
 function getFilePath(basePath, id) {
-return path.join(basePath, ${id}.json);
+return path.join(basePath, `${id}.json`);
 }
 
 global.db = {
@@ -97,7 +94,7 @@ for (const file of files) {
 const id = path.basename(file, '.json');
 
 if (ignorePatterns.some(pattern => id.includes(pattern))) {
-continue;
+continue; 
 }
 const db = new Low(new JSONFile(getFilePath(dirPath, id)));
 await db.read();
@@ -105,8 +102,8 @@ db.data = db.data || {};
 targetObj[id] = { ...targetObj[id], ...db.data };
 }};
 
-await Promise.all([loadFiles(usersPath, global.db.data.users, ['@newsletter', 'lid']),
-loadFiles(chatsPath, global.db.data.chats, ['@newsletter']),
+await Promise.all([loadFiles(usersPath, global.db.data.users, ['@newsletter', 'lid']), 
+loadFiles(chatsPath, global.db.data.chats, ['@newsletter']), 
 loadFiles(settingsPath, global.db.data.settings),
 loadFiles(msgsPath, global.db.data.msgs),
 loadFiles(stickerPath, global.db.data.sticker),
@@ -134,7 +131,7 @@ try {
 const saveFiles = async (dirPath, dataObj, ignorePatterns = []) => {
 for (const [id, data] of Object.entries(dataObj)) {
 if (ignorePatterns.some(pattern => id.includes(pattern))) {
-continue;
+continue; 
 }
 
 const db = new Low(new JSONFile(getFilePath(dirPath, id)));
@@ -142,8 +139,8 @@ db.data = data;
 await db.write();
 }};
 
-await Promise.all([saveFiles(usersPath, global.db.data.users, ['@newsletter', 'lid']),
-saveFiles(chatsPath, global.db.data.chats, ['@newsletter']),
+await Promise.all([saveFiles(usersPath, global.db.data.users, ['@newsletter', 'lid']), 
+saveFiles(chatsPath, global.db.data.chats, ['@newsletter']), 
 saveFiles(settingsPath, global.db.data.settings),
 saveFiles(msgsPath, global.db.data.msgs),
 saveFiles(stickerPath, global.db.data.sticker),
@@ -715,9 +712,6 @@ return false
 }}
 
 async function joinChannels(conn) {
-  global.ch = global.ch || {}; // ضمان أن global.ch كائن حتى لو لم يتم تحميله بعد
-
-  for (const channelId of Object.values(global.ch)) {
-    await conn.newsletterFollow(channelId).catch(() => {});
-  }
-}
+for (const channelId of Object.values(global.ch)) {
+await conn.newsletterFollow(channelId).catch(() => {})
+}}
